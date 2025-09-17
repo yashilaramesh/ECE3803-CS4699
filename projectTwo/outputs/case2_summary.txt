@@ -1,0 +1,12 @@
+Init: rand_small
+Final spins: [ 1 -1  1  1 -1 -1 -1  1]
+Cut value: 16.600
+
+Init: rand_med
+Final spins: [-1  1 -1 -1  1 -1 -1  1]
+Cut value: 15.400
+
+Init: rand_big
+Final spins: [ 1 -1  1  1 -1 -1 -1  1]
+Cut value: 16.600
+
