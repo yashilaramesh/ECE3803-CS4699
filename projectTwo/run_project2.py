@@ -12,9 +12,6 @@ from hopfield import (
 outdir = Path("/Users/yashila/Documents/GitHub/NengoBrain/projectTwo/outputs")
 outdir.mkdir(parents=True, exist_ok=True)
 
-# ----------------------------
-# Helper plotting functions
-# ----------------------------
 def plot_pattern(y01, title, savepath):
     fig = plt.figure()
     plt.stem(np.arange(len(y01)), y01, use_line_collection=True)

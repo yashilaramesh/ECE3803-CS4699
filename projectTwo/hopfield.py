@@ -1,9 +1,7 @@
 
 import numpy as np
 
-# -------------------------------
-# Utilities
-# -------------------------------
+# Convert between {0,1} and {-1,1} representations
 def to_bipolar(y01: np.ndarray) -> np.ndarray:
     """Map {0,1}^n -> {-1,1}^n"""
     return 2.0 * y01 - 1.0
@@ -20,7 +18,7 @@ def hebbian_weights_from_patterns(patterns_01: np.ndarray, zero_diagonal: bool =
     """
     patterns = to_bipolar(patterns_01)  # (k, n) in {-1,1}
     k, n = patterns.shape
-    W = np.zeros((n, n), dtype=float)
+    W = np.zeros((n, n), dtype=float) # sum over outer products
     for p in patterns:
         W += np.outer(p, p)
     if normalize and n > 0:
