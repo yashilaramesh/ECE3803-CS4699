@@ -6,7 +6,7 @@ from hopfield import (
     hebbian_weights_from_patterns,
     ContinuousHopfield,
     to_bipolar, from_bipolar,
-    hopfield_for_maxcut, cut_value
+    maxcut, cut_value
 )
 
 outdir = Path("/Users/yashila/Documents/GitHub/NengoBrain/projectTwo/outputs")
@@ -57,44 +57,37 @@ def plot_state(s, title, savepath, y01=False):
 n = 25
 rng = np.random.default_rng(42)
 
-# Create three distinct binary patterns (0/1)
-# Here we choose structured patterns for clarity.
 p1 = np.zeros(n); p1[:n//2] = 1  # first half ones
 p2 = np.zeros(n); p2[::2] = 1    # even indices ones
-p3 = (rng.random(n) > 0.5).astype(float)  # random bits
+p3 = (rng.random(n) > 0.5).astype(float)  # random bit
 
 patterns = np.vstack([p1, p2, p3])  # shape (3, n)
 
-# Save pattern plots
 plot_pattern(p1, "Pattern 1 (0/1)", outdir / "case1_pattern1.png")
 plot_pattern(p2, "Pattern 2 (0/1)", outdir / "case1_pattern2.png")
 plot_pattern(p3, "Pattern 3 (0/1)", outdir / "case1_pattern3.png")
 
-# Hebbian weights (using provided formula via bipolar mapping)
+# Compute Hebbian weights
 W = hebbian_weights_from_patterns(patterns, zero_diagonal=True, normalize=True)
 plot_matrix(W, "Weights W (Hebbian, zero diag, normalized)", outdir / "case1_W.png")
-
-# Build network
 tau = 1.0
 beta = 4.0
 net = ContinuousHopfield(W=W, tau=tau, beta=beta, seed=7)
 
-# For each stored pattern, start from a noisy init and show convergence
 T = 5.0
 dt = 0.01
-noise_std = 0.6
+noise_std = 2
 
 for idx, target in enumerate(patterns, start=1):
     net.set_state_from_pattern01(target, noise_std=noise_std)
     ts, _, traj_s, energies = net.run(T=T, dt=dt, record=True)
-    # Save energy trajectory
     plot_trajectory(ts, energies, f"Case 1: Energy (Pattern {idx})", outdir / f"case1_energy_p{idx}.png")
-    # Save initial vs final states
+
     s_init = traj_s[0]
     s_final = traj_s[-1]
     plot_state(s_init, f"Case 1: Initial s (Pattern {idx})", outdir / f"case1_init_s_p{idx}.png")
     plot_state(s_final, f"Case 1: Final s (Pattern {idx})", outdir / f"case1_final_s_p{idx}.png")
-    # Also save final hard readout in 0/1
+
     y_final = (np.sign(s_final) + 1.0) / 2.0
     plot_state(np.sign(s_final), f"Case 1: Final sign(s) (Pattern {idx})", outdir / f"case1_final_signs_p{idx}.png")
     plot_state(y_final, f"Case 1: Final y (0/1) (Pattern {idx})", outdir / f"case1_final_y01_p{idx}.png")
@@ -103,7 +96,7 @@ for idx, target in enumerate(patterns, start=1):
 # Case 2: Max-Cut on small graph (n = 8), three inits
 # ----------------------------
 m = 8
-# Define a small weighted undirected graph
+
 A = np.zeros((m, m), dtype=float)
 edges = [
     (0,1,1.0), (0,2,0.8), (1,2,0.5), (1,3,1.2), (2,4,1.1),
@@ -113,8 +106,8 @@ edges = [
 for i,j,w in edges:
     A[i,j] = w; A[j,i] = w
 
-# Build Hopfield for Max-Cut: W = -A
-maxcut_net = hopfield_for_maxcut(A, tau=1.0, beta=4.0, seed=123)
+
+maxcut_net = maxcut(A, tau=1.0, beta=4.0, seed=123)
 
 # Plot adjacency and implied W
 fig = plt.figure()
@@ -133,7 +126,6 @@ plt.xlabel("j"); plt.ylabel("i")
 fig.savefig(outdir / "case2_W_minusA.png", bbox_inches="tight")
 plt.close(fig)
 
-# Run from three different initial conditions
 T2 = 6.0
 dt2 = 0.01
 inits = [

@@ -16,22 +16,19 @@ def hebbian_weights_from_patterns(patterns_01: np.ndarray, zero_diagonal: bool =
     patterns_01: shape (k, n) with entries in {0,1}.
     Returns symmetric W with optional zero diagonal.
     """
-    patterns = to_bipolar(patterns_01)  # (k, n) in {-1,1}
+    patterns = to_bipolar(patterns_01)
     k, n = patterns.shape
-    W = np.zeros((n, n), dtype=float) # sum over outer products
+    W = np.zeros((n, n), dtype=float)
     for p in patterns:
         W += np.outer(p, p)
     if normalize and n > 0:
         W /= n
     if zero_diagonal:
         np.fill_diagonal(W, 0.0)
-    # ensure symmetry
     W = 0.5 * (W + W.T)
     return W
 
-# -------------------------------
-# Simple fixed-step RK4 integrator
-# -------------------------------
+
 def rk4_step(f, t, x, dt):
     k1 = f(t, x)
     k2 = f(t + 0.5*dt, x + 0.5*dt*k1)
@@ -39,11 +36,9 @@ def rk4_step(f, t, x, dt):
     k4 = f(t + dt, x + dt*k3)
     return x + (dt/6.0) * (k1 + 2*k2 + 2*k3 + k4)
 
-# -------------------------------
-# Continuous-time Hopfield Network
 # du/dt = (-u + W*s + b) / tau,  s = tanh(beta * u)
-# Energy proxy: E = -0.5 * s^T W s - b^T s  (monitors descent qualitatively)
-# -------------------------------
+# E = -0.5 * s^T W s - b^T s
+
 class ContinuousHopfield:
     def __init__(self, W: np.ndarray, tau: float = 1.0, beta: float = 4.0, bias: np.ndarray | None = None, seed: int | None = None):
         """
@@ -65,8 +60,6 @@ class ContinuousHopfield:
     def set_state_from_pattern01(self, y01: np.ndarray, noise_std: float = 0.0):
         """Initialize u near the bipolar version of a 0/1 pattern."""
         s_target = to_bipolar(y01.astype(float))
-        # Initialize u so that tanh(beta u) ≈ s_target
-        # arctanh maps (-1,1) -> R; clip to avoid inf
         eps = 1e-5
         s_clip = np.clip(s_target, -1+eps, 1-eps)
         u0 = np.arctanh(s_clip) / self.beta
@@ -123,13 +116,8 @@ class ContinuousHopfield:
         """Return discrete {-1,1} state from current s."""
         return np.sign(self.s + 1e-12)  # avoid zeros
 
-# -------------------------------
-# Max-Cut via Hopfield
-# Given weighted adjacency A (symmetric, zero diag), the Max-Cut objective:
-# maximize (1/2) * sum_{i<j} A_ij * (1 - s_i s_j)  with s_i in {-1,1}
-# Equivalent to minimizing -0.5 * s^T A s  => set W = -A
-# -------------------------------
-def hopfield_for_maxcut(A: np.ndarray, tau: float = 1.0, beta: float = 4.0, seed: int | None = None) -> ContinuousHopfield:
+
+def maxcut(A: np.ndarray, tau: float = 1.0, beta: float = 4.0, seed: int | None = None) -> ContinuousHopfield:
     A = 0.5 * (A + A.T)
     np.fill_diagonal(A, 0.0)
     W = -A.copy()
@@ -138,9 +126,7 @@ def hopfield_for_maxcut(A: np.ndarray, tau: float = 1.0, beta: float = 4.0, seed
 def cut_value(A: np.ndarray, s_sign: np.ndarray) -> float:
     """Compute cut value for spins s in {-1,1}^n and adjacency A."""
     # Cut = sum_{i<j} A_ij * [s_i != s_j] = 0.5 * sum_{i<j} A_ij * (1 - s_i s_j)
-    # Implement with matrix ops
     A = 0.5 * (A + A.T)
     np.fill_diagonal(A, 0.0)
     S = np.outer(s_sign, s_sign)
-    total = 0.5 * np.sum(A * (1.0 - S))
-    return float(total)
+    return float(0.25 * np.sum(A * (1.0 - S)))
