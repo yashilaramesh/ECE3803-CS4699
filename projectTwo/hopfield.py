@@ -53,7 +53,7 @@ class ContinuousHopfield:
         self.beta = float(beta)
         self.b = np.zeros(self.n) if bias is None else bias.astype(float)
         self.rng = np.random.default_rng(seed)
-        # state u and output s
+
         self.u = np.zeros(self.n, dtype=float)
         self.s = np.tanh(self.beta * self.u)
 

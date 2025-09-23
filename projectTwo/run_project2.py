@@ -8,7 +8,7 @@ from hopfield import (
     to_bipolar, from_bipolar,
     maxcut, cut_value
 )
-
+print("Running project 2 script...")
 outdir = Path("/Users/yashila/Documents/GitHub/NengoBrain/projectTwo/outputs")
 outdir.mkdir(parents=True, exist_ok=True)
 
@@ -61,7 +61,7 @@ p1 = np.zeros(n); p1[:n//2] = 1  # first half ones
 p2 = np.zeros(n); p2[::2] = 1    # even indices ones
 p3 = (rng.random(n) > 0.5).astype(float)  # random bit
 
-patterns = np.vstack([p1, p2, p3])  # shape (3, n)
+patterns = np.vstack([p1, p2, p3])
 
 plot_pattern(p1, "Pattern 1 (0/1)", outdir / "case1_pattern1.png")
 plot_pattern(p2, "Pattern 2 (0/1)", outdir / "case1_pattern2.png")
@@ -109,7 +109,6 @@ for i,j,w in edges:
 
 maxcut_net = maxcut(A, tau=1.0, beta=4.0, seed=123)
 
-# Plot adjacency and implied W
 fig = plt.figure()
 plt.imshow(A, aspect="equal")
 plt.colorbar()
@@ -142,12 +141,11 @@ for name, scale in inits:
     value = cut_value(A, s_final_sign)
     results.append((name, s_final_sign, value, ts, energies, traj_s))
 
-    # Save plots
+
     plot_trajectory(ts, energies, f"Case 2: Energy ({name})", outdir / f"case2_energy_{name}.png")
     plot_state(traj_s[0], f"Case 2: Initial s ({name})", outdir / f"case2_init_s_{name}.png")
     plot_state(traj_s[-1], f"Case 2: Final s ({name})", outdir / f"case2_final_s_{name}.png")
 
-# Save a small text summary
 with open(outdir / "case2_summary.txt", "w") as f:
     for name, s_sign, val, _, _, _ in results:
         f.write(f"Init: {name}\n")
