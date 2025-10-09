@@ -6,7 +6,7 @@ C     = 50e-12        # integrator capacitance [F]
 V_L   = 50e-3         # FG scaling voltage [V]
 Q     = 2.0           # quality factor (shape of the band)
 
-f0    = 1_000.0       # target center frequency [Hz]
+f0    = 3_000.0       # target center frequency [Hz]
 w0    = 2*np.pi*f0
 
 I_bias = w0 * C * V_L
