@@ -6,7 +6,7 @@ C      = 50e-12      # integrating capacitance per output [F]
 V_L    = 50e-3       # TA scaling voltage [V]
 I_bias = 20e-9       # TA bias current [A]
 I_s    = I_bias      # slope scale inside tanh
-k_L    = 0.6*I_bias  # leak strength
+k_L    = 0.6*I_bias  # leak strength (A-equivalent)
 k_I    = 1.2*I_bias  # lateral inhibition strength
 
 # VMM dimensions
