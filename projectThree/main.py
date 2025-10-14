@@ -1,12 +1,14 @@
+#dataset: https://www.kaggle.com/datasets/quadeer15sh/image-super-resolution-from-unsplash
+#dataset: https://www.kaggle.com/datasets/soumikrakshit/div2k-high-resolution-images
 import os, glob
 import numpy as np
 from PIL import Image, ImageOps
 import matplotlib.pyplot as plt
 
-IMAGES_DIR = os.path.join(os.path.dirname(__file__), "images")
-BLOCK = 20
-RESULSTS_DIR = os.path.join(os.path.dirname(__file__), "results")
-paths = sorted(glob.glob(os.path.join(IMAGES_DIR, "*.jpg")))
+IMAGES_DIR = os.path.join(os.path.dirname(__file__), "imagesSet2")
+BLOCK = 12
+RESULSTS_DIR = os.path.join(os.path.dirname(__file__), "resultsSet2")
+paths = sorted(glob.glob(os.path.join(IMAGES_DIR, "*.png")))
 assert paths, f"No .jpg files found in {IMAGES_DIR}"
 
 all_blocks_flat = []
@@ -46,9 +48,6 @@ print(f"Skipped small images: {skipped_small} | Skipped partial blocks: {skipped
 
 covar = np.cov(X, rowvar=False)
 eigenvalues, eigenvectors = np.linalg.eigh(covar)
-
-# np.save(os.path.join(RESULSTS_DIR, "patches_8x8.npy"), X)
-# np.save(os.path.join(RESULSTS_DIR, "patches_8x8_index.npy"), np.array(index, dtype=object))
 
 mu = X.mean(axis=0, keepdims=True)
 Xc = X - X.mean(axis=0, keepdims=True)
@@ -95,7 +94,7 @@ def plot_evr(EVR, out_name=f"evr_scree_block{BLOCK}.png"):
 # Activation map of one PC over one image
 def activation_map_for(filename, pc_idx=0, block=BLOCK, out_prefix=f"activation"):
     rows = [i for i, (fn, y, x) in enumerate(index) if fn == filename]
-    assert rows, f"No patches found for {filename}"
+
     ys = [index[i][1] for i in rows]
     xs = [index[i][2] for i in rows]
     Nr = max(ys)//block + 1
@@ -144,11 +143,11 @@ def reconstruct_image(filename, k=16, block=BLOCK, out_prefix="recon"):
     return out
 
 #run
-# plot_pc_filters(W, k=64, out_name=f"pc_filters_top64_{BLOCK}.png")
+#plot_pc_filters(W, k=64, out_name=f"pc_filters_top64_{BLOCK}.png")
 # plot_evr(EVR, out_name=f"evr_scree_block{BLOCK}.png")
-
-example_file = index[80100][0] #0(1), 125100,21100(106), 300100,50100(117),500200,80100(129)
-act_path = activation_map_for(example_file, pc_idx=0)
+#0(1), 763100,03006100(39), 2596100,10372101(134), 2855100,11414100(148)
+example_file = index[763100][0] #0(1), 125100,21100(106), 300100,50100(117),500200,80100(129)
+act_path = activation_map_for(example_file, pc_idx=5)
 rec_path = reconstruct_image(example_file, k=32)
 
 print("finished!")
