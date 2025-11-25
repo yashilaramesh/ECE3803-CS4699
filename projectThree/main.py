@@ -9,7 +9,7 @@ IMAGES_DIR = os.path.join(os.path.dirname(__file__), "imagesSet2")
 BLOCK = 12
 RESULSTS_DIR = os.path.join(os.path.dirname(__file__), "resultsSet2")
 paths = sorted(glob.glob(os.path.join(IMAGES_DIR, "*.png")))
-assert paths, f"No .jpg files found in {IMAGES_DIR}"
+
 
 all_blocks_flat = []
 index = []
@@ -75,7 +75,6 @@ def plot_pc_filters(W, block=BLOCK, k=32, out_name=f"pc_filters_top32_{BLOCK}.pn
     plt.savefig(os.path.join(RESULSTS_DIR, out_name), dpi=200)
     plt.close()
 
-# Scree plot (EVR and cumulative EVR)
 def plot_evr(EVR, out_name=f"evr_scree_block{BLOCK}.png"):
     csum = np.cumsum(EVR)
     xs = np.arange(1, len(EVR)+1)

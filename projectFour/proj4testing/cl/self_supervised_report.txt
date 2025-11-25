@@ -1,0 +1,8 @@
+Self-Supervised Audio Training Report
+-------------------------------------
+Samples used: 1151264
+Taps: 64
+Identity final MSE: 9.844306e-05
+Predict+8 final MSE: 1.502322e-02
+Eigen cond #: 3.481113e+03
+Note: Larger eigenvalue spreads (higher condition number) imply slower convergence for gradient/LMS-type methods; step sizes must be chosen below 2/λ_max for stability, and effective progress along small-eigen directions becomes slow when κ=λ_max/λ_min is large.

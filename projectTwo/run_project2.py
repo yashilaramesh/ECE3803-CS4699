@@ -9,7 +9,7 @@ from hopfield import (
     maxcut, cut_value
 )
 print("Running project 2 script...")
-outdir = Path("/Users/yashila/Documents/GitHub/NengoBrain/projectTwo/outputs")
+outdir = Path("/Users/yashila/Documents/GitHub/ECE3803-CS4699/projectTwo/outputs")
 outdir.mkdir(parents=True, exist_ok=True)
 
 def plot_pattern(y01, title, savepath):
@@ -51,9 +51,8 @@ def plot_state(s, title, savepath, y01=False):
     fig.savefig(savepath, bbox_inches="tight")
     plt.close(fig)
 
-# ----------------------------
+
 # Case 1: Store 3 patterns, n >= 21
-# ----------------------------
 n = 25
 rng = np.random.default_rng(42)
 
@@ -92,9 +91,8 @@ for idx, target in enumerate(patterns, start=1):
     plot_state(np.sign(s_final), f"Case 1: Final sign(s) (Pattern {idx})", outdir / f"case1_final_signs_p{idx}.png")
     plot_state(y_final, f"Case 1: Final y (0/1) (Pattern {idx})", outdir / f"case1_final_y01_p{idx}.png")
 
-# ----------------------------
+
 # Case 2: Max-Cut on small graph (n = 8), three inits
-# ----------------------------
 m = 8
 
 A = np.zeros((m, m), dtype=float)
@@ -152,4 +150,4 @@ with open(outdir / "case2_summary.txt", "w") as f:
         f.write(f"Final spins: {s_sign.astype(int)}\n")
         f.write(f"Cut value: {val:.3f}\n\n")
 
-print("Done. Outputs written to", outdir)
+

@@ -1,1 +1,10 @@
-10-9-2025
+
+fixes for 
+Increased I_bias (10 nA) - speeds up the dynamics
+Negative V_bias (-0.2V) - increases the competitive gain in the extended differential pair
+Lower V_dd (1.2V) - keeps more headroom
+I_prog = 0.5 × I_bias - creates the right balance between the charging and discharging terms in Eq. 25
+Smaller input voltages - ensures the exponential terms stay in a good operating range
+
+
+the outputs are no longer stuck at one rail! But we're still not seeing clear winner-take-all behavior. The outputs are all converging to nearly the same voltage (~1.65V at the rail), with only slight modulation following the inputs.

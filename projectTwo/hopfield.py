@@ -3,18 +3,14 @@ import numpy as np
 
 # Convert between {0,1} and {-1,1} representations
 def to_bipolar(y01: np.ndarray) -> np.ndarray:
-    """Map {0,1}^n -> {-1,1}^n"""
     return 2.0 * y01 - 1.0
 
 def from_bipolar(s: np.ndarray) -> np.ndarray:
-    """Map {-1,1}^n -> {0,1}^n"""
     return (s + 1.0) / 2.0
 
 def hebbian_weights_from_patterns(patterns_01: np.ndarray, zero_diagonal: bool = True, normalize: bool = True) -> np.ndarray:
     """
     Hebbian learning for Hopfield weights.
-    patterns_01: shape (k, n) with entries in {0,1}.
-    Returns symmetric W with optional zero diagonal.
     """
     patterns = to_bipolar(patterns_01)
     k, n = patterns.shape
@@ -41,12 +37,6 @@ def rk4_step(f, t, x, dt):
 
 class ContinuousHopfield:
     def __init__(self, W: np.ndarray, tau: float = 1.0, beta: float = 4.0, bias: np.ndarray | None = None, seed: int | None = None):
-        """
-        W: symmetric weight matrix (n x n)
-        tau: time constant
-        beta: slope of tanh (inverse "temperature")
-        bias: optional bias vector b (n,)
-        """
         self.W = 0.5 * (W + W.T)
         self.n = W.shape[0]
         self.tau = float(tau)
@@ -58,7 +48,6 @@ class ContinuousHopfield:
         self.s = np.tanh(self.beta * self.u)
 
     def set_state_from_pattern01(self, y01: np.ndarray, noise_std: float = 0.0):
-        """Initialize u near the bipolar version of a 0/1 pattern."""
         s_target = to_bipolar(y01.astype(float))
         eps = 1e-5
         s_clip = np.clip(s_target, -1+eps, 1-eps)
@@ -69,7 +58,6 @@ class ContinuousHopfield:
         self.s = np.tanh(self.beta * self.u)
 
     def set_state_random(self, scale: float = 0.5):
-        """Random u initialization."""
         self.u = self.rng.normal(0.0, scale, size=self.n)
         self.s = np.tanh(self.beta * self.u)
 
@@ -113,8 +101,7 @@ class ContinuousHopfield:
         return -0.5 * float(s @ (self.W @ s)) - float(self.b @ s)
 
     def hard_readout(self) -> np.ndarray:
-        """Return discrete {-1,1} state from current s."""
-        return np.sign(self.s + 1e-12)  # avoid zeros
+        return np.sign(self.s + 1e-12)
 
 
 def maxcut(A: np.ndarray, tau: float = 1.0, beta: float = 4.0, seed: int | None = None) -> ContinuousHopfield:
@@ -124,7 +111,6 @@ def maxcut(A: np.ndarray, tau: float = 1.0, beta: float = 4.0, seed: int | None 
     return ContinuousHopfield(W=W, tau=tau, beta=beta, bias=None, seed=seed)
 
 def cut_value(A: np.ndarray, s_sign: np.ndarray) -> float:
-    """Compute cut value for spins s in {-1,1}^n and adjacency A."""
     # Cut = sum_{i<j} A_ij * [s_i != s_j] = 0.5 * sum_{i<j} A_ij * (1 - s_i s_j)
     A = 0.5 * (A + A.T)
     np.fill_diagonal(A, 0.0)
